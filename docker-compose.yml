@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: network_db
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: network_dashboard
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: network_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017/network_dashboard?authSource=admin
+      JWT_SECRET: your_super_secret_jwt_key
+      JWT_EXPIRE: 7d
+      PYTHON_PATH: python3
+    depends_on:
+      - mongodb
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: network_frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_SOCKET_URL: http://localhost:3000
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:

@@ -1,0 +1,16 @@
+hostname CORE-R1
+type router
+role core
+mgmt-ip 10.10.0.1/24
+vlan 10
+vlan 20
+
+interface Gig0/0
+ ip address 10.10.10.1/24
+ gateway 10.10.10.254
+ link ACCESS-SW1 Gig0/1
+
+interface Gig0/1
+ ip address 172.16.0.1/24
+ gateway 172.16.9.254
+ link BRANCH-R1 Gig0/0

@@ -1,0 +1,16 @@
+hostname ACCESS-SW1
+type switch
+role distribution
+mgmt-ip 10.10.0.2/24
+vlan 10
+vlan 30
+
+interface Gig0/1
+ ip address 10.10.10.2/24
+ gateway 10.10.10.254
+ link CORE-R1 Gig0/0
+
+interface Gig0/2
+ ip address 10.20.0.2/24
+ gateway 10.20.0.254
+ link BRANCH-R1 Gig0/1

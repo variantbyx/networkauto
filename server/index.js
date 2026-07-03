@@ -28,10 +28,25 @@ function getConfiguredOrigins() {
   return ["http://localhost:5173", "http://127.0.0.1:5173"];
 }
 
+function isAllowedOrigin(origin) {
+  if (!origin) {
+    return true;
+  }
+
+  const configuredOrigins = getConfiguredOrigins();
+  if (configuredOrigins.includes(origin)) {
+    return true;
+  }
+
+  return /^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)*\.onrender\.com$/i.test(origin);
+}
+
 const allowedOrigins = getConfiguredOrigins();
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      callback(null, isAllowedOrigin(origin));
+    },
     methods: ["GET", "POST", "DELETE"],
     credentials: true,
   },
@@ -44,7 +59,9 @@ const hasDist = fs.existsSync(distDir);
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      callback(null, isAllowedOrigin(origin));
+    },
     credentials: true,
   }),
 );

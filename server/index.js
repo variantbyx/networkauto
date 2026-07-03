@@ -50,6 +50,29 @@ app.use(
 );
 app.use(express.json({ limit: "2mb" }));
 
+app.get("/", (_req, res) => {
+  res.json({
+    status: "Backend is running",
+    message: "Network Automation Dashboard API",
+    endpoints: {
+      auth: ["POST /api/auth/register", "POST /api/auth/login"],
+      dashboard: "GET /api/dashboard",
+      config: ["POST /api/config/analyze", "GET /api/config/history"],
+      health: ["GET /health", "GET /api/health"],
+    },
+  });
+});
+
+app.get("/health", (_req, res) => {
+  res.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    mongodb:
+      mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+  });
+});
+
 async function connectMongo() {
   if (!process.env.MONGODB_URI) {
     console.warn("MongoDB URI not set; using local fallback stores.");
